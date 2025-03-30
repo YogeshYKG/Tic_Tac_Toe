@@ -1,3 +1,4 @@
+/* App.module.css */
 :root {
   --background-color: #0a0211;
   --text-color: white;
@@ -46,7 +47,7 @@ body {
   align-items: center;
 }
 
-.top-bar {
+.topBar {
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -55,7 +56,7 @@ body {
   margin-bottom: 20px;
 }
 
-.theme-selector {
+.themeSelector {
   padding: 5px;
   border-radius: 5px;
   background-color: var(--button-bg-color);
@@ -71,7 +72,7 @@ h1 {
   margin-bottom: 10px;
 }
 
-.winner-text {
+.winnerText {
   font-size: 1.5rem;
   color: var(--highlight-color);
 }
@@ -120,12 +121,12 @@ h1 {
   background-color: lightgray;
 }
 
-.settings-container {
+.settingsContainer {
   position: relative;
   display: inline-block;
 }
 
-.settings-button {
+.settingsButton {
   background: var(--button-bg-color);
   color: var(--button-text-color);
   border: none;
@@ -136,12 +137,12 @@ h1 {
   transition: background 0.3s ease, color 0.3s ease;
 }
 
-.settings-button:hover {
+.settingsButton:hover {
   background: var(--highlight-color);
   color: black;
 }
 
-.settings-dropdown {
+.settingsDropdown {
   position: absolute;
   top: 40px;
   right: -35px;
@@ -151,21 +152,20 @@ h1 {
   box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
   padding: 12px;
   width: 150px;
-  display: flex
-;
+  display: flex;
   flex-direction: column;
   gap: 8px;
   z-index: 10;
 }
 
-.setting-item {
+.settingItem {
   display: flex;
   justify-content: space-between;
   align-items: center;
   font-size: 14px;
 }
 
-.setting-item select {
+.settingItem select {
   background: var(--button-bg-color);
   color: var(--button-text-color);
   border: 1px solid var(--text-color);

@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import "./App.css";
+import styles from "./App.module.css";
 
 function App() {
   const [board, setBoard] = useState(Array(9).fill(null));
@@ -11,7 +11,7 @@ function App() {
 
   useEffect(() => {
     const root = document.documentElement;
-    const updateSystemTheme = () => {
+    const updateTheme = () => {
       if (theme === "system") {
         const prefersDark = window.matchMedia(
           "(prefers-color-scheme: dark)"
@@ -21,11 +21,11 @@ function App() {
         root.setAttribute("data-theme", theme);
       }
     };
-    updateSystemTheme();
+    updateTheme();
     const mediaQuery = window.matchMedia("(prefers-color-scheme: dark)");
-    mediaQuery.addEventListener("change", updateSystemTheme);
+    mediaQuery.addEventListener("change", updateTheme);
     localStorage.setItem("theme", theme);
-    return () => mediaQuery.removeEventListener("change", updateSystemTheme);
+    return () => mediaQuery.removeEventListener("change", updateTheme);
   }, [theme]);
 
   useEffect(() => {
@@ -48,8 +48,7 @@ function App() {
       [0, 4, 8],
       [2, 4, 6],
     ];
-    for (let pattern of winPatterns) {
-      const [a, b, c] = pattern;
+    for (let [a, b, c] of winPatterns) {
       if (
         newBoard[a] &&
         newBoard[a] === newBoard[b] &&
@@ -87,19 +86,19 @@ function App() {
   };
 
   return (
-    <div className="container">
-      <div className="top-bar">
+    <div className={styles.container}>
+      <div className={styles.topBar}>
         <h1>Tic Tac Toe</h1>
-        <div className="settings-container">
+        <div className={styles.settingsContainer}>
           <button
-            className="settings-button"
+            className={styles.settingsButton}
             onClick={() => setSettingsOpen(!settingsOpen)}
           >
             ⚙️ Settings
           </button>
           {settingsOpen && (
-            <div className="settings-dropdown">
-              <div className="setting-item">
+            <div className={styles.settingsDropdown}>
+              <div className={styles.settingItem}>
                 <label>Theme:</label>
                 <select
                   value={theme}
@@ -110,7 +109,7 @@ function App() {
                   <option value="light">Light</option>
                 </select>
               </div>
-              <div className="setting-item">
+              <div className={styles.settingItem}>
                 <label>Opponent:</label>
                 <select
                   value={opponent}
@@ -129,20 +128,24 @@ function App() {
       </div>
 
       {winner && (
-        <h2 className="winner-text">
+        <h2 className={styles.winnerText}>
           {winner === "Draw" ? "It's a Draw!" : `${winner} Wins!`}
         </h2>
       )}
 
-      <div className="board">
+      <div className={styles.board}>
         {board.map((value, index) => (
-          <div key={index} className="cell" onClick={() => handleClick(index)}>
+          <div
+            key={index}
+            className={styles.cell}
+            onClick={() => handleClick(index)}
+          >
             {value}
           </div>
         ))}
       </div>
 
-      <button className="restart" onClick={restartGame}>
+      <button className={styles.restart} onClick={restartGame}>
         Restart
       </button>
     </div>
