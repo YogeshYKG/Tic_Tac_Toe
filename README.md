@@ -40,6 +40,5 @@ npm run dev
 If you like this project, **star** ⭐ the repo and share it!  
 
 ## 📸 Screenshots  
-![image](https://github.com/user-attachments/assets/7b1e51a5-3d68-48df-a0f5-7252a508d212)
 ![image](https://github.com/user-attachments/assets/ec8ddc93-6599-45b4-909b-783f0f5d97bf)
 
