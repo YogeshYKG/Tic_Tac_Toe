@@ -1,5 +1,10 @@
+// src/App.jsx
 import { useState, useEffect } from "react";
-import styles from "./App.module.css";
+import Board from "./components/Board";
+import Settings from "./components/Setting";
+import { checkWinner, getAIMove } from "./utils/gameLogic";
+import { updateTheme } from "./utils/theme";
+import styles from "./styles/App.module.css";
 
 function App() {
   const [board, setBoard] = useState(Array(9).fill(null));
@@ -9,25 +14,18 @@ function App() {
   const [opponent, setOpponent] = useState("self");
   const [settingsOpen, setSettingsOpen] = useState(false);
 
+  // Update theme based on user preference
   useEffect(() => {
     const root = document.documentElement;
-    const updateTheme = () => {
-      if (theme === "system") {
-        const prefersDark = window.matchMedia(
-          "(prefers-color-scheme: dark)"
-        ).matches;
-        root.setAttribute("data-theme", prefersDark ? "dark" : "light");
-      } else {
-        root.setAttribute("data-theme", theme);
-      }
-    };
-    updateTheme();
+    updateTheme(theme, root);
     const mediaQuery = window.matchMedia("(prefers-color-scheme: dark)");
-    mediaQuery.addEventListener("change", updateTheme);
+    const handleThemeChange = () => updateTheme(theme, root);
+    mediaQuery.addEventListener("change", handleThemeChange);
     localStorage.setItem("theme", theme);
-    return () => mediaQuery.removeEventListener("change", updateTheme);
+    return () => mediaQuery.removeEventListener("change", handleThemeChange);
   }, [theme]);
 
+  // AI move effect
   useEffect(() => {
     if (opponent === "ai" && !isXNext && !winner) {
       const aiMove = getAIMove(board);
@@ -36,38 +34,6 @@ function App() {
       }
     }
   }, [board, isXNext, winner, opponent]);
-
-  const checkWinner = (newBoard) => {
-    const winPatterns = [
-      [0, 1, 2],
-      [3, 4, 5],
-      [6, 7, 8],
-      [0, 3, 6],
-      [1, 4, 7],
-      [2, 5, 8],
-      [0, 4, 8],
-      [2, 4, 6],
-    ];
-    for (let [a, b, c] of winPatterns) {
-      if (
-        newBoard[a] &&
-        newBoard[a] === newBoard[b] &&
-        newBoard[a] === newBoard[c]
-      ) {
-        return newBoard[a];
-      }
-    }
-    return newBoard.includes(null) ? null : "Draw";
-  };
-
-  const getAIMove = (currentBoard) => {
-    const emptyCells = currentBoard
-      .map((val, idx) => (val === null ? idx : null))
-      .filter((val) => val !== null);
-    return emptyCells.length > 0
-      ? emptyCells[Math.floor(Math.random() * emptyCells.length)]
-      : null;
-  };
 
   const handleClick = (index) => {
     if (board[index] || winner) return;
@@ -97,32 +63,15 @@ function App() {
             ⚙️ Settings
           </button>
           {settingsOpen && (
-            <div className={styles.settingsDropdown}>
-              <div className={styles.settingItem}>
-                <label>Theme:</label>
-                <select
-                  value={theme}
-                  onChange={(e) => setTheme(e.target.value)}
-                >
-                  <option value="system">System</option>
-                  <option value="dark">Dark</option>
-                  <option value="light">Light</option>
-                </select>
-              </div>
-              <div className={styles.settingItem}>
-                <label>Opponent:</label>
-                <select
-                  value={opponent}
-                  onChange={(e) => {
-                    setOpponent(e.target.value);
-                    restartGame();
-                  }}
-                >
-                  <option value="self">Self</option>
-                  <option value="ai">AI</option>
-                </select>
-              </div>
-            </div>
+            <Settings
+              theme={theme}
+              opponent={opponent}
+              setTheme={setTheme}
+              setOpponent={(value) => {
+                setOpponent(value);
+                restartGame();
+              }}
+            />
           )}
         </div>
       </div>
@@ -133,17 +82,7 @@ function App() {
         </h2>
       )}
 
-      <div className={styles.board}>
-        {board.map((value, index) => (
-          <div
-            key={index}
-            className={styles.cell}
-            onClick={() => handleClick(index)}
-          >
-            {value}
-          </div>
-        ))}
-      </div>
+      <Board board={board} handleClick={handleClick} />
 
       <button className={styles.restart} onClick={restartGame}>
         Restart
