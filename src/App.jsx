@@ -9,7 +9,7 @@ import styles from "./styles/App.module.css";
 
 // Create the Socket.io connection outside the component.
 // (In production, update the URL as needed.)
-const socket = io("http://localhost:4000");
+const socket = io("https://tictactoe-backend-production.up.railway.app/");
 
 function App() {
   const [board, setBoard] = useState(Array(9).fill(null));
@@ -36,7 +36,7 @@ function App() {
 
   // If multiplayer is enabled, join a game room and listen for game updates.
   useEffect(() => {
-    debugger
+    debugger;
     if (multiplayer === "online") {
       // Join the room
       socket.emit("joinGame", roomId);
@@ -52,7 +52,6 @@ function App() {
     }
   }, [multiplayer, roomId]);
 
-
   // AI move effect
   useEffect(() => {
     if (opponent === "ai" && !isXNext && !winner && multiplayer === "offline") {
@@ -66,11 +65,10 @@ function App() {
   const handleClick = (index) => {
     // Prevent move if cell already occupied or game over
     if (board[index] || winner) return;
-    if(multiplayer === "online") {
+    if (multiplayer === "online") {
       // For multiplayer, emit the move to the server
-      socket.emit("makeMove", {roomId, index})
-    }
-    else{
+      socket.emit("makeMove", { roomId, index });
+    } else {
       const newBoard = [...board];
       newBoard[index] = isXNext ? "X" : "O";
       setBoard(newBoard);
