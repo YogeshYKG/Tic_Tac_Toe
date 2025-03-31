@@ -1,3 +1,4 @@
+import { io } from "socket.io-client";
 // src/App.jsx
 import { useState, useEffect } from "react";
 import Board from "./components/Board";
@@ -6,13 +7,21 @@ import { checkWinner, getAIMove } from "./utils/gameLogic";
 import { updateTheme } from "./utils/theme";
 import styles from "./styles/App.module.css";
 
+// Create the Socket.io connection outside the component.
+// (In production, update the URL as needed.)
+const socket = io("http://localhost:4000");
+
 function App() {
   const [board, setBoard] = useState(Array(9).fill(null));
   const [isXNext, setIsXNext] = useState(true);
   const [winner, setWinner] = useState(null);
   const [theme, setTheme] = useState(localStorage.getItem("theme") || "system");
   const [opponent, setOpponent] = useState("self");
+  const [multiplayer, setMultiplayer] = useState("offline");
   const [settingsOpen, setSettingsOpen] = useState(false);
+
+  // For simplicity, using a fixed room id. Later you can make it dynamic.
+  const [roomId, setRoomId] = useState("game123");
 
   // Update theme based on user preference
   useEffect(() => {
@@ -25,9 +34,28 @@ function App() {
     return () => mediaQuery.removeEventListener("change", handleThemeChange);
   }, [theme]);
 
+  // If multiplayer is enabled, join a game room and listen for game updates.
+  useEffect(() => {
+    debugger
+    if (multiplayer === "online") {
+      // Join the room
+      socket.emit("joinGame", roomId);
+
+      // Listen for game state updates from the server
+      socket.on("gameState", (game) => {
+        setBoard(game.board);
+        setIsXNext(game.isXNext);
+      });
+
+      // Clean up the event listener on unmount or when multiplayer changes
+      return () => socket.off("gameState");
+    }
+  }, [multiplayer, roomId]);
+
+
   // AI move effect
   useEffect(() => {
-    if (opponent === "ai" && !isXNext && !winner) {
+    if (opponent === "ai" && !isXNext && !winner && multiplayer === "offline") {
       const aiMove = getAIMove(board);
       if (aiMove !== null) {
         setTimeout(() => handleClick(aiMove), 500);
@@ -36,19 +64,30 @@ function App() {
   }, [board, isXNext, winner, opponent]);
 
   const handleClick = (index) => {
+    // Prevent move if cell already occupied or game over
     if (board[index] || winner) return;
-    const newBoard = [...board];
-    newBoard[index] = isXNext ? "X" : "O";
-    setBoard(newBoard);
-    setIsXNext(!isXNext);
-    const result = checkWinner(newBoard);
-    if (result) setWinner(result);
+    if(multiplayer === "online") {
+      // For multiplayer, emit the move to the server
+      socket.emit("makeMove", {roomId, index})
+    }
+    else{
+      const newBoard = [...board];
+      newBoard[index] = isXNext ? "X" : "O";
+      setBoard(newBoard);
+      setIsXNext(!isXNext);
+      const result = checkWinner(newBoard);
+      if (result) setWinner(result);
+    }
   };
 
   const restartGame = () => {
-    setBoard(Array(9).fill(null));
-    setIsXNext(true);
-    setWinner(null);
+    if (multiplayer === "online") {
+      socket.emit("restartGame", roomId);
+    } else {
+      setBoard(Array(9).fill(null));
+      setIsXNext(true);
+      setWinner(null);
+    }
   };
 
   return (
@@ -65,10 +104,15 @@ function App() {
           {settingsOpen && (
             <Settings
               theme={theme}
-              opponent={opponent}
               setTheme={setTheme}
+              opponent={opponent}
               setOpponent={(value) => {
                 setOpponent(value);
+                restartGame();
+              }}
+              multiplayer={multiplayer}
+              setMultiplayer={(value) => {
+                setMultiplayer(value);
                 restartGame();
               }}
             />
