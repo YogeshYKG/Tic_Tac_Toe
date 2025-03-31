@@ -1,7 +1,7 @@
 // src/components/Settings.jsx
 import styles from "../styles/Setting.module.css";
 
-function Settings({ theme, opponent, setTheme, setOpponent }) {
+function Settings({ theme, opponent, setTheme, setOpponent, multiplayer, setMultiplayer }) {
   return (
     <div className={styles.settingsDropdown}>
       <div className={styles.settingItem}>
@@ -17,6 +17,13 @@ function Settings({ theme, opponent, setTheme, setOpponent }) {
         <select value={opponent} onChange={(e) => setOpponent(e.target.value)}>
           <option value="self">Self</option>
           <option value="ai">AI</option>
+        </select>
+      </div>
+      <div className={styles.settingItem}>
+        <label>Multiplayer:</label>
+        <select value={multiplayer} onChange={(e) => setMultiplayer(e.target.value)}>
+          <option value="offline">Offline</option>
+          <option value="online">Online</option>
         </select>
       </div>
     </div>
