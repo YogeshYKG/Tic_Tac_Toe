@@ -23,7 +23,8 @@ function Settings({ theme, opponent, setTheme, setOpponent, multiplayer, setMult
         <label>Multiplayer:</label>
         <select value={multiplayer} onChange={(e) => setMultiplayer(e.target.value)}>
           <option value="offline">Offline</option>
-          <option value="online">Online</option>
+          <option value="online">Enter a Room</option>
+          <option value="online_match">Find a Match</option>
         </select>
       </div>
     </div>
