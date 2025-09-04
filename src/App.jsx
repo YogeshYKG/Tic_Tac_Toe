@@ -1,6 +1,6 @@
 import { io } from "socket.io-client";
 // src/App.jsx
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import Board from "./components/Board";
 import Settings from "./components/Setting";
 import { checkWinner, getAIMove } from "./utils/gameLogic";
@@ -22,6 +22,27 @@ function App() {
 
   // For simplicity, using a fixed room id. Later you can make it dynamic.
   const [roomId, setRoomId] = useState("game123");
+
+
+  // Close Setting when clicked outside
+  const settingsRef = useRef(null);
+  useEffect(()=>{
+    debugger
+    function handleClickOutside(event){
+      if(settingsRef.current && !settingsRef.current.contains(event.target)){
+        setSettingsOpen(false);
+      }
+    }
+      if(settingsOpen){
+        document.addEventListener('mousedown', handleClickOutside);
+      }
+      return () => {
+        document.addEventListener('mousedown', handleClickOutside);
+      }
+    
+  }, [settingsOpen])
+  
+
 
   // Update theme based on user preference
   useEffect(() => {
@@ -92,7 +113,7 @@ function App() {
     <div className={styles.container}>
       <div className={styles.topBar}>
         <h1>Tic Tac Toe</h1>
-        <div className={styles.settingsContainer}>
+        <div className={styles.settingsContainer} ref={settingsRef}>
           <button
             className={styles.settingsButton}
             onClick={() => setSettingsOpen(!settingsOpen)}
